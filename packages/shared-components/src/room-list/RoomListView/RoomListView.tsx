@@ -12,7 +12,7 @@ import { RoomListPrimaryFilters, type FilterId } from "../RoomListPrimaryFilters
 import { RoomListLoadingSkeleton } from "./RoomListLoadingSkeleton";
 import { RoomListEmptyStateView } from "./RoomListEmptyStateView";
 import { VirtualizedRoomListView, type RoomListViewState } from "../VirtualizedRoomListView";
-import { type Room, type RoomListItemViewModel } from "../RoomListItemView";
+import { type CallParticipantListItem, type Room, type RoomListItemViewModel } from "../RoomListItemView";
 import { type RoomListSectionHeaderViewModel } from "../RoomListSectionHeaderView";
 
 export type RoomListSection = {
@@ -81,12 +81,14 @@ export interface RoomListViewProps {
     renderAvatar: (room: Room) => ReactNode;
     /** Optional callback for keyboard events on the room list */
     onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+    /** Render function for user avatar */
+    renderUserAvatar: (participant: CallParticipantListItem) => ReactNode;
 }
 
 /**
  * Room list view component that manages filters, loading states, empty states, and the room list.
  */
-export const RoomListView: React.FC<RoomListViewProps> = ({ vm, renderAvatar, onKeyDown }): JSX.Element => {
+export const RoomListView: React.FC<RoomListViewProps> = ({ vm, renderAvatar, onKeyDown, renderUserAvatar }): JSX.Element => {
     const snapshot = useViewModel(vm);
     let listBody: ReactNode;
 
@@ -95,7 +97,7 @@ export const RoomListView: React.FC<RoomListViewProps> = ({ vm, renderAvatar, on
     } else if (snapshot.isRoomListEmpty) {
         listBody = <RoomListEmptyStateView vm={vm} />;
     } else {
-        listBody = <VirtualizedRoomListView vm={vm} renderAvatar={renderAvatar} onKeyDown={onKeyDown} />;
+        listBody = <VirtualizedRoomListView vm={vm} renderAvatar={renderAvatar} onKeyDown={onKeyDown} renderUserAvatar={renderUserAvatar} />;
     }
 
     return (

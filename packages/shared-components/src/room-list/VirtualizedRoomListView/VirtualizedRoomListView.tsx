@@ -9,7 +9,7 @@ import React, { useCallback, useMemo, useRef, type JSX, type ReactNode } from "r
 import { type ScrollIntoViewLocation } from "react-virtuoso";
 import { isEqual } from "lodash";
 
-import { type Room } from "../RoomListItemView";
+import { type Room, type CallParticipantListItem } from "../RoomListItemView";
 import { useViewModel } from "../../core/viewmodel";
 import { _t } from "../../core/i18n/i18n";
 import {
@@ -58,6 +58,12 @@ export interface VirtualizedRoomListViewProps {
      * Optional callback for keyboard key down events
      */
     onKeyDown?: (e: React.KeyboardEvent<HTMLDivElement>) => void;
+
+    /**
+     * Render function for user avatar
+     * @param avatarUrl - The URL of the user's avatar
+     */
+    renderUserAvatar: (participant: CallParticipantListItem) => ReactNode;
 }
 
 /** Height of a single room list item in pixels (44px item + 8px padding bottom) */
@@ -105,7 +111,7 @@ const EXTENDED_VIEWPORT_HEIGHT = 25 * ROOM_LIST_ITEM_HEIGHT;
  * <VirtualizedRoomListView vm={roomListViewModel} renderAvatar={(room) => <Avatar room={room} />} />
  * ```
  */
-export function VirtualizedRoomListView({ vm, renderAvatar, onKeyDown }: VirtualizedRoomListViewProps): JSX.Element {
+export function VirtualizedRoomListView({ vm, renderAvatar, onKeyDown, renderUserAvatar }: VirtualizedRoomListViewProps): JSX.Element {
     const snapshot = useViewModel(vm);
     const { roomListState, sections, isFlatList } = snapshot;
     const activeRoomIndex = roomListState.activeRoomIndex;
@@ -173,10 +179,11 @@ export function VirtualizedRoomListView({ vm, renderAvatar, onKeyDown }: Virtual
                     isFirstItem={isFirstItem}
                     isLastItem={isLastItem}
                     isInFlatList={isFlatList}
+                    renderCallUserAvatar={renderUserAvatar}
                 />
             );
         },
-        [renderAvatar],
+        [renderAvatar, renderUserAvatar],
     );
 
     /**
