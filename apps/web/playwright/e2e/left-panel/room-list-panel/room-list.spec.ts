@@ -10,6 +10,7 @@ import { type Page } from "@playwright/test";
 import { expect, test } from "../../../element-web-test";
 import { type Bot } from "../../../pages/bot";
 import { type ElementAppPage } from "../../../pages/ElementAppPage";
+import { getRoomList } from "./utils";
 
 test.describe("Room list", () => {
     test.use({
@@ -20,16 +21,9 @@ test.describe("Room list", () => {
         },
     });
 
-    /**
-     * Get the room list
-     * @param page
-     */
-    function getRoomList(page: Page) {
-        return page.getByTestId("room-list");
-    }
-
     test.beforeEach(async ({ page, app, user }) => {
-        // The notification toast is displayed above the search section
+        // The toasts are displayed above the search section
+        await app.closeVerifyToast();
         await app.closeNotificationToast();
 
         // focus the user menu to avoid to have hover decoration
@@ -328,11 +322,11 @@ test.describe("Room list", () => {
 
             const roomListView = getRoomList(page);
             const videoRoom = roomListView.getByRole("option", { name: "video room" });
+            await expect(videoRoom).toHaveAttribute("aria-selected", "true"); // wait for room list update
 
             // focus the user menu to avoid to have hover decoration
             await page.getByRole("button", { name: "User menu" }).focus();
 
-            await expect(videoRoom).toBeVisible();
             await expect(videoRoom).toMatchScreenshot("room-list-item-video.png");
         });
     });
